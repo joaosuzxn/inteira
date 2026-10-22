@@ -1,5 +1,5 @@
 /// Comando para o ar. "Ligar" leva o estado completo desejado, então repetir dá o mesmo resultado.
-public enum ACCommand: Sendable, Equatable {
+public enum ACCommand: Sendable, Equatable, Codable {
     case turnOn(temperature: Int)
     case turnOff
     case setTemperature(Int)
