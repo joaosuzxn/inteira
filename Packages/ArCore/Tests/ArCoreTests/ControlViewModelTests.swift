@@ -90,6 +90,22 @@ fileprivate final class FakeControl: ACControlling, @unchecked Sendable {
         #expect(model.status?.isOn == false)
     }
 
+    @Test func resetClearsStateAndCancelsPendingSend() async {
+        let control = FakeControl(isOn: true, target: 23, sendError: MideaCloudError.network)
+        let model = make(control)
+        await model.refresh()
+        model.increment()
+        await waitUntil { clock.sleeperCount == 1 }
+        model.reset()
+        #expect(model.status == nil)
+        #expect(model.pendingTemperature == nil)
+        #expect(model.errorMessage == nil)
+        #expect(model.displayedTemperature == nil)
+        clock.advance(by: .seconds(1))
+        await Task.yield()
+        #expect(control.sent.isEmpty)
+    }
+
     @Test func errorShowsUserMessageAndClearsBusy() async {
         let control = FakeControl(isOn: true, sendError: MideaCloudError.network)
         let model = make(control)

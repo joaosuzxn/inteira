@@ -32,6 +32,15 @@ public final class ControlViewModel {
         self.clock = clock
     }
 
+    /// Esquece estado, temperatura pendente e erro (ao sair da conta ou trocar de aparelho).
+    public func reset() {
+        debounceTask?.cancel()
+        debounceTask = nil
+        status = nil
+        pendingTemperature = nil
+        errorMessage = nil
+    }
+
     public func refresh() async {
         do {
             status = try await control.status()
