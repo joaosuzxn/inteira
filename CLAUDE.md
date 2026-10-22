@@ -55,11 +55,18 @@ Não há manual do operador: o único usuário é o dono. O texto `resumo` dos i
 
     ar/
     ├── .claude/            # agentes, skills e hook deste projeto
+    ├── App/
+    │   ├── Shared/         # Theme.swift (cores e fonte, spec §6.4)
+    │   ├── iOS/            # ArApp.swift, Info.plist (permissões de localização)
+    │   └── macOS/          # ArMenuBarApp.swift (MenuBarExtra), Info.plist (LSUIElement)
+    ├── Config/             # Base.xcconfig, Local.xcconfig.example (Local.xcconfig é ignorado)
+    ├── Packages/ArCore/    # pacote Swift com toda a lógica (nuvem, automação, armazenamento, view model)
     ├── docs/               # specs, planos, ADRs, backlog, análises
-    └── tools/backlog/      # CLI do backlog
+    ├── tools/backlog/      # CLI do backlog
+    └── project.yml         # fonte do projeto Xcode (XcodeGen); Ar.xcodeproj é gerado e ignorado
 
-O projeto Xcode ainda não existe; a estrutura do código sai do plano (backlog #1). Ao criá-lo,
-atualizar esta seção, a seção Comandos e os "Arquivos Críticos" dos agentes `ar-*`.
+Alvos: `Ar-iOS` (bundle `io.github.joaosuzxn.ar`) e `Ar-macOS` (bundle `io.github.joaosuzxn.ar.mac`,
+sem ícone no Dock, assinatura "Sign to Run Locally"). Os apps são finos; a lógica fica no ArCore.
 
 ## Stack
 
@@ -74,8 +81,13 @@ atualizar esta seção, a seção Comandos e os "Arquivos Críticos" dos agentes
 
 ## Comandos
 
-A preencher quando o projeto Xcode existir (esquema, destino de teste do macOS, instalação no iPhone).
-Instalação no iPhone: skill `/instalar-iphone`.
+    xcodegen generate                                   # gera Ar.xcodeproj a partir de project.yml
+    swift test --package-path Packages/ArCore           # testes da lógica
+    xcodebuild -project Ar.xcodeproj -scheme Ar-iOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+    xcodebuild -project Ar.xcodeproj -scheme Ar-macOS -destination 'platform=macOS' build
+
+Para instalar no iPhone, copiar `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e pôr o Team ID
+(arquivo ignorado pelo git; o repositório é público). Instalação: skill `/instalar-iphone`.
 
 ## Convenções
 
