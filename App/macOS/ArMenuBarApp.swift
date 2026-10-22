@@ -3,14 +3,19 @@ import ArCore
 
 @main
 struct ArMenuBarApp: App {
-    /// Referência a um símbolo do ArCore, só para provar o vínculo do pacote.
-    private let temperatureRange = ACCommand.temperatureRange
+    @State private var model = MacAppModel()
 
     var body: some Scene {
         MenuBarExtra {
-            Button("Sair do app") { NSApplication.shared.terminate(nil) }
+            MenuPanel(model: model)
         } label: {
-            Text("❄︎")
+            MenuBarLabel(control: model.control)
         }
+        .menuBarExtraStyle(.window)
+
+        Window("Conta Midea", id: "conta") {
+            AccountWindow(model: model)
+        }
+        .windowResizability(.contentSize)
     }
 }
