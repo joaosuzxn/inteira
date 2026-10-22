@@ -5,6 +5,10 @@ import ArCore
 struct ArMenuBarApp: App {
     @State private var model = MacAppModel()
 
+    init() {
+        NSApplication.shared.appearance = NSAppearance(named: .darkAqua)
+    }
+
     var body: some Scene {
         MenuBarExtra {
             MenuPanel(model: model)
@@ -17,5 +21,6 @@ struct ArMenuBarApp: App {
             AccountWindow(model: model)
         }
         .windowResizability(.contentSize)
+        .defaultLaunchBehavior(.suppressed)
     }
 }
