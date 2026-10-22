@@ -203,6 +203,76 @@ public actor MideaCloudClient {
         return object
     }
 
+    // MARK: - Aparelhos, estado e comandos
+
+    /// Portado de `list_appliances`. O `sn` vem cifrado com a chave de sessão.
+    public func listAppliances() async throws -> [Appliance] {
+        let data = try await request("/v1/appliance/user/list/get", body: generalData())
+        guard let items = data["list"] as? [[String: Any]] else {
+            throw MideaCloudError.unexpectedResponse(code: 0, message: "resposta sem lista de aparelhos")
+        }
+        return try items.compactMap { item in
+            guard let idText = item["id"].flatMap({ "\($0)" }), let id = Int64(idText),
+                  let typeText = item["type"] as? String,
+                  let type = Int(typeText.dropFirst(typeText.hasPrefix("0x") ? 2 : 0), radix: 16)
+            else { return nil }
+            var sn = ""
+            if let encrypted = item["sn"] as? String, !encrypted.isEmpty {
+                guard let keys = sessionKeys, let plain = try? MideaCrypto.decryptWithSessionKeys(hex: encrypted, keys: keys)
+                else { throw MideaCloudError.unexpectedResponse(code: 0, message: "número de série ilegível") }
+                sn = plain
+            }
+            return Appliance(
+                id: id, name: item["name"] as? String ?? "", type: type, sn: sn,
+                modelNumber: item["modelNumber"] as? String ?? "0",
+                manufacturerCode: item["enterpriseCode"] as? String ?? "0000",
+                online: item["onlineStatus"] as? String == "1")
+        }
+    }
+
+    /// Portado de `get_device_status` (consulta vazia devolve todos os atributos).
+    public func status(of appliance: Appliance) async throws -> ACStatus {
+        let data = try await request(
+            "/v1/device/status/lua/get", body: try deviceBody(appliance, command: ["query": [String: String]()]))
+        return ACStatus(
+            isOn: data["power"] as? String == "on",
+            mode: data["mode"] as? String ?? "",
+            targetTemperature: (Self.number(data["temperature"]) ?? 0) + (Self.number(data["small_temperature"]) ?? 0) / 10,
+            indoorTemperature: Self.number(data["indoor_temperature"]))
+    }
+
+    /// Portado de `send_device_control`. Aparelho offline não chama a rede.
+    public func send(_ command: ACCommand, to appliance: Appliance) async throws {
+        guard appliance.online else { throw MideaCloudError.applianceOffline }
+        _ = try await request(
+            "/v1/device/lua/control", body: try deviceBody(appliance, command: ["control": command.control]))
+    }
+
+    /// Corpo comum de estado e controle. A chave `"encryptedType "` tem espaço no fim, como na referência.
+    private func deviceBody(_ appliance: Appliance, command: [String: any Sendable]) throws -> [String: any Sendable] {
+        [
+            "clientType": "1",
+            "appId": MideaConstants.appId,
+            "format": "2",
+            "deviceId": deviceId,
+            "iotAppId": MideaConstants.appId,
+            "applianceMFCode": appliance.manufacturerCode,
+            "applianceType": String(format: "0x%02X", appliance.type),
+            "modelNumber": appliance.modelNumber,
+            "applianceSn": try MideaCrypto.encryptWithFixedKey(appliance.sn),
+            "version": "0",
+            "encryptedType ": "2",
+            "applianceCode": String(appliance.id),
+            "command": command,
+        ]
+    }
+
+    private static func number(_ value: Any?) -> Double? {
+        if let n = value as? NSNumber { return n.doubleValue }
+        if let s = value as? String { return Double(s) }
+        return nil
+    }
+
     // MARK: - Auxiliares
 
     private func generalData() -> [String: any Sendable] {
