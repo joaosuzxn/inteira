@@ -16,3 +16,6 @@ graphify-out/cache/
 
 # Superpowers: esboços do brainstorming
 .superpowers/
+
+Ar.xcodeproj/
+Config/Local.xcconfig
