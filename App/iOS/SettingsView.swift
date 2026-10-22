@@ -8,6 +8,8 @@ struct SettingsView: View {
     @State private var draft = AutomationSettings()
     @State private var confirmSignOut = false
     @State private var errorMessage: String?
+    @State private var locatingHome = false
+    @State private var homeMessage: String?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -34,10 +36,12 @@ struct SettingsView: View {
 
     private var automaticSection: some View {
         section("Automático") {
-            Toggle(isOn: Binding(get: { draft.enabled }, set: { draft.enabled = $0; commit() })) {
+            Toggle(isOn: Binding(get: { draft.enabled }, set: { setEnabled($0) })) {
                 label("Ligar e desligar sozinho")
             }
             .tint(Theme.ok)
+
+            homeRow
 
             slider(
                 "Raio de chegada", value: Binding(get: { draft.arrivalRadius }, set: { draft.arrivalRadius = $0 }),
@@ -63,6 +67,32 @@ struct SettingsView: View {
                     Text("\(draft.autoTemperature) °C").font(Theme.font(13, weight: .medium))
                 }
             }
+        }
+    }
+
+    private var homeRow: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                label("Casa")
+                Spacer()
+                Text(draft.home == nil ? "não definida" : "definida")
+                    .font(Theme.font(13, weight: .medium))
+                    .foregroundStyle(draft.home == nil ? Theme.secondary : Theme.text)
+            }
+            Button {
+                Task { await useCurrentLocation() }
+            } label: {
+                Text(locatingHome ? "Lendo a localização…" : "Usar minha localização atual como casa")
+                    .font(Theme.font(13, weight: .semibold))
+                    .foregroundStyle(Theme.text)
+                    .frame(maxWidth: .infinity).padding(.vertical, 10)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.border, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .disabled(locatingHome)
+            Text(homeMessage ?? "Faça isso estando em casa.")
+                .font(Theme.font(11))
+                .foregroundStyle(homeMessage == nil ? Theme.secondary : Theme.error)
         }
     }
 
@@ -92,6 +122,22 @@ struct SettingsView: View {
     private func commit() {
         model.updateSettings { $0 = draft }
         draft = model.settings
+    }
+
+    private func setEnabled(_ enabled: Bool) {
+        model.setAutomaticEnabled(enabled)
+        draft = model.settings
+    }
+
+    private func useCurrentLocation() async {
+        locatingHome = true
+        homeMessage = nil
+        if await model.useCurrentLocationAsHome() {
+            draft = model.settings
+        } else {
+            homeMessage = "Não consegui ler a localização. Confira a permissão nos Ajustes do iPhone."
+        }
+        locatingHome = false
     }
 
     private func signOut() async {

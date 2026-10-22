@@ -3,7 +3,13 @@ import ArCore
 
 @main
 struct ArApp: App {
-    @State private var model = AppModel()
+    @State private var model: AppModel
+
+    init() {
+        // Criado aqui, na abertura do processo, e não quando uma tela aparece: se o iOS relançar o app
+        // em segundo plano por entrada ou saída de região, o monitor já está aberto para receber o evento.
+        _model = State(initialValue: AppModel())
+    }
 
     var body: some Scene {
         WindowGroup {

@@ -33,12 +33,14 @@ struct MainView: View {
         .task {
             await model.control.refresh()
             await model.reloadHistory()
+            await model.refreshAutomationStatus()
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
             Task {
                 await model.control.refresh()
                 await model.reloadHistory()
+                await model.refreshAutomationStatus()
             }
         }
         // O controle grava no histórico; relê quando o estado ou o erro mudam.
@@ -94,17 +96,41 @@ struct MainView: View {
 
     private var automaticCard: some View {
         let settings = model.settings
+        let active = settings.enabled && settings.home != nil && !model.needsAlwaysPermission
         return card(title: "Automático") {
-            chip(settings.enabled ? "● ativo" : "desligado", color: settings.enabled ? Theme.ok : Theme.secondary)
+            if model.needsAlwaysPermission {
+                chip("sem permissão", color: Theme.error)
+            } else {
+                chip(active ? "● ativo" : "desligado", color: active ? Theme.ok : Theme.secondary)
+            }
         } content: {
             HStack(alignment: .top, spacing: 6) {
                 kv("Chegada", Self.distance(settings.arrivalRadius))
                 kv("Saída", Self.distance(settings.departureRadius))
                 kv("Fora", Self.minutes(settings.minAbsenceForArrival))
             }
+            if settings.home != nil {
+                HStack(alignment: .top, spacing: 6) {
+                    kv("Casa a", model.distanceToHome.map(AutomationCoordinator.radiusText) ?? "—")
+                    TimelineView(.periodic(from: .now, by: 60)) { context in
+                        kv("Fora há", model.lastArrivalExit.map {
+                            Self.minutes(max(0, context.date.timeIntervalSince($0)))
+                        } ?? "—")
+                    }
+                }
+            }
             if settings.home == nil {
                 Text("Configure a casa nos ajustes")
                     .font(Theme.font(11)).foregroundStyle(Theme.secondary)
+            }
+            if model.needsAlwaysPermission {
+                Text("Permissão de localização 'Sempre' necessária")
+                    .font(Theme.font(11)).foregroundStyle(Theme.error)
+                Button("Abrir Ajustes do iPhone") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }
+                .font(Theme.font(11, weight: .semibold))
+                .foregroundStyle(Theme.text)
             }
             if settings.departureSmallerThanArrival {
                 Text("O raio de saída é menor que o de chegada")

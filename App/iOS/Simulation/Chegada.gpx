@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Rota de teste da automação (Xcode: Debug > Simulate Location > Chegada).
+  Casa de teste: Praça da Sé, São Paulo (lugar público; nunca use a casa real neste arquivo).
+  Sai da casa, vai até 5 km ao norte, fica lá e volta. Com raio de chegada de 2 km, sai do raio
+  por volta de 12:04 e entra de novo por volta de 12:39: 35 min fora, acima dos 30 min padrão.
+-->
+<gpx version="1.1" creator="Xcode" xmlns="http://www.topografix.com/GPX/1/1">
+    <wpt lat="-23.5503" lon="-46.6340"><time>2026-01-01T12:00:00Z</time></wpt>
+    <wpt lat="-23.5413" lon="-46.6340"><time>2026-01-01T12:02:00Z</time></wpt>
+    <wpt lat="-23.5278" lon="-46.6340"><time>2026-01-01T12:05:00Z</time></wpt>
+    <wpt lat="-23.5053" lon="-46.6340"><time>2026-01-01T12:08:00Z</time></wpt>
+    <wpt lat="-23.5053" lon="-46.6340"><time>2026-01-01T12:35:00Z</time></wpt>
+    <wpt lat="-23.5278" lon="-46.6340"><time>2026-01-01T12:38:00Z</time></wpt>
+    <wpt lat="-23.5413" lon="-46.6340"><time>2026-01-01T12:41:00Z</time></wpt>
+    <wpt lat="-23.5503" lon="-46.6340"><time>2026-01-01T12:43:00Z</time></wpt>
+</gpx>
