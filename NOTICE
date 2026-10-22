@@ -1,0 +1,7 @@
+ar
+
+Este projeto contém código portado de midea_auto_cloud
+(https://github.com/sususweet/midea_auto_cloud), licenciado sob Apache License 2.0.
+Commit de referência: ce0c4b88224def0f6b53714312c19f71aa9c2a50
+Arquivo de origem: custom_components/midea_auto_cloud/core/security.py
+O código foi reescrito em Swift; constantes e fórmulas do protocolo vêm dessa fonte.
