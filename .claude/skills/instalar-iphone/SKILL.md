@@ -18,13 +18,23 @@ expira **7 dias depois da instalação**; depois disso o app não abre e a autom
 
 ## Instalar
 
-O esquema, o caminho do `.app` e o id do aparelho ficam na seção Comandos do `CLAUDE.md`, preenchida
-quando o projeto Xcode for criado. A sequência é:
+Pré-requisito: `Config/Local.xcconfig` com o `DEVELOPMENT_TEAM` do dono (modelo em
+`Config/Local.xcconfig.example`; o arquivo é ignorado pelo git). Esquema `Ar-iOS`, bundle `io.github.joaosuzxn.ar`.
 
-1. Build assinado para iOS: `xcodebuild` com o esquema do app, `-destination` do iPhone,
-   `-allowProvisioningUpdates` (o Xcode renova o perfil gratuito com a conta Apple configurada nele).
-2. Instalar: `xcrun devicectl device install app --device` com o id do aparelho e o `.app` gerado.
-3. Abrir: `xcrun devicectl device process launch --device` com o id e o bundle id.
+1. Gerar o projeto e achar o aparelho:
+
+       xcodegen generate
+       xcrun devicectl list devices        # anotar o id do iPhone
+
+2. Build assinado (o Xcode renova o perfil gratuito com a conta Apple configurada nele):
+
+       xcodebuild -project Ar.xcodeproj -scheme Ar-iOS -destination 'generic/platform=iOS' \
+         -configuration Debug -derivedDataPath build -allowProvisioningUpdates build
+
+3. Instalar e abrir:
+
+       xcrun devicectl device install app --device <id> build/Build/Products/Debug-iphoneos/Ar.app
+       xcrun devicectl device process launch --device <id> io.github.joaosuzxn.ar
 
 Se o Xcode reclamar de conta ou de perfil, pedir ao dono para abrir o Xcode → Settings → Accounts e
 conferir a conta Apple; não tentar contornar a assinatura.
