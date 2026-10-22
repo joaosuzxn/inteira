@@ -36,3 +36,9 @@ import Testing
     #expect(try MideaCrypto.decryptWithSessionKeys(hex: enc.hexString, keys: keys) == "olá")
     #expect(throws: MideaCryptoError.self) { try MideaCrypto.decryptWithSessionKeys(hex: "zz", keys: keys) }
 }
+
+@Test func aesRejectsShortIV() {
+    #expect(throws: MideaCryptoError.self) {
+        try MideaCrypto.aesCBCDecrypt(Data(count: 16), key: Data("0123456789abcdef".utf8), iv: Data("short".utf8))
+    }
+}

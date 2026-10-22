@@ -87,6 +87,10 @@ enum MideaCrypto {
     }
 
     private static func crypt(_ operation: CCOperation, _ input: Data, key: Data, iv: Data) throws -> Data {
+        // Chave e IV de sessão vêm da rede: exigir 16 bytes antes de passar ao CommonCrypto.
+        guard key.count == kCCKeySizeAES128, iv.count == kCCBlockSizeAES128 else {
+            throw MideaCryptoError.cryptorFailure(Int32(kCCParamError))
+        }
         var output = Data(count: input.count + kCCBlockSizeAES128)
         let capacity = output.count
         var produced = 0
