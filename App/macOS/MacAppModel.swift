@@ -47,6 +47,7 @@ final class MacAppModel {
         let stored = (try? store.load()) ?? nil
         isSignedIn = stored?.appliance != nil
         applianceName = stored?.appliance?.name
+        control.reset()
         Task { await refresh() }
     }
 
