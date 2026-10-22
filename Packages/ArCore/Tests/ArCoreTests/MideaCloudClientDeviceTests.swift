@@ -63,7 +63,7 @@ private func sampleAppliance(online: Bool = true) -> Appliance {
 
     let req = try #require(await t.requests.last)
     let body = req.bodyJSON
-    #expect(body["applianceCode"] as? String == "123")
+    #expect(body["applianceCode"] as? Int64 == 123)
     #expect(body["applianceType"] as? String == "0xAC")
     #expect(body["applianceSn"] as? String == (try MideaCrypto.encryptWithFixedKey(appliance.sn)))
     #expect(body["encryptedType "] as? String == "2")

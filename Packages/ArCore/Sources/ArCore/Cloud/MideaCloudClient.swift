@@ -262,7 +262,7 @@ public actor MideaCloudClient {
             "applianceSn": try MideaCrypto.encryptWithFixedKey(appliance.sn),
             "version": "0",
             "encryptedType ": "2",
-            "applianceCode": String(appliance.id),
+            "applianceCode": appliance.id,
             "command": command,
         ]
     }
