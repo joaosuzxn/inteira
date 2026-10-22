@@ -21,6 +21,9 @@ public actor MideaCloudClient {
     private var accessToken: String?
     private var uid = ""
     private var lastLoginAttempt: Date?
+    /// Login em andamento: chamadas concorrentes esperam por ele em vez de iniciar outro
+    /// (o Python usa `_relogin_lock`; no actor, a reentrada nos `await` exigiria isto).
+    private var loginTask: Task<Void, Error>?
     /// Chave e IV de sessão do último login (usados pelas Tasks de comando e estado).
     private(set) var sessionKeys: SessionKeys?
 
@@ -51,6 +54,14 @@ public actor MideaCloudClient {
 
     /// Rota, id de login e login. Conta como tentativa para o limite de relogin.
     public func login() async throws {
+        if let running = loginTask { return try await running.value }
+        let task = Task { try await self.performLogin() }
+        loginTask = task
+        defer { loginTask = nil }
+        try await task.value
+    }
+
+    private func performLogin() async throws {
         lastLoginAttempt = now()
         accessToken = nil
         try await reRoute()
@@ -124,6 +135,9 @@ public actor MideaCloudClient {
     func request(_ endpoint: String, body: [String: any Sendable]) async throws -> sending [String: Any] {
         var relogged = false
         while true {
+            // Com login em andamento, espera: assim a requisição sai com o token novo.
+            if let running = loginTask { try await running.value }
+            let tokenAtSend = accessToken
             let response = try await send(endpoint, body)
             let status = Self.code(of: response)
             if status == 0 {
@@ -131,6 +145,17 @@ public actor MideaCloudClient {
             }
             if Self.isTokenInvalid(response) {
                 if relogged { throw MideaCloudError.tokenInvalid }
+                // Outro login já está rodando ou terminou depois do envio: espera e refaz,
+                // sem iniciar outro (conta como o relogin desta requisição).
+                if let running = loginTask {
+                    relogged = true
+                    try await running.value
+                    continue
+                }
+                if accessToken != tokenAtSend {
+                    relogged = true
+                    continue
+                }
                 if let last = lastLoginAttempt, now().timeIntervalSince(last) < Self.reloginCooldown {
                     throw MideaCloudError.reloginThrottled
                 }

@@ -160,3 +160,56 @@ private func makeClient(_ t: FakeTransport, clock: Clock = Clock()) -> MideaClou
     await #expect(throws: MideaCloudError.network) { try await client.request(otherPath, body: [:]) }
     await #expect(throws: MideaCloudError.network) { try await client.login() }
 }
+
+private func waitUntilHeld(_ t: FakeTransport, _ alias: String, count: Int = 1) async {
+    for _ in 0..<2000 {
+        if await t.heldCount(alias) >= count { return }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+}
+
+@Test func concurrentTokenInvalidSharesOneRelogin() async throws {
+    let t = FakeTransport()
+    let clock = Clock()
+    await enqueueLoginFlow(t)
+    let client = makeClient(t, clock: clock)
+    try await client.login()
+
+    clock.advance(120)
+    await t.enqueue(otherPath, #"{"code":40002}"#)
+    await t.enqueue(otherPath, #"{"code":40002}"#)
+    await enqueueLoginFlow(t)
+    await t.enqueue(otherPath, #"{"code":0,"data":{}}"#)
+    await t.enqueue(otherPath, #"{"code":0,"data":{}}"#)
+    await t.gate(otherPath)
+    async let a: Void = { _ = try await client.request(otherPath, body: ["n": 1]) }()
+    async let b: Void = { _ = try await client.request(otherPath, body: ["n": 2]) }()
+    await waitUntilHeld(t, otherPath, count: 2)
+    await t.release(otherPath)
+    try await a
+    try await b
+
+    let aliases = await t.requests.map(\.alias)
+    #expect(aliases.filter { $0 == loginPath }.count == 2)
+    #expect(aliases.filter { $0 == otherPath }.count == 4)
+}
+
+@Test func requestDuringLoginWaitsAndCarriesNewToken() async throws {
+    let t = FakeTransport()
+    await enqueueLoginFlow(t)
+    await t.enqueue(otherPath, #"{"code":0,"data":{}}"#)
+    let client = makeClient(t)
+    await t.gate(routePath)
+    async let login: Void = client.login()
+    await waitUntilHeld(t, routePath)
+    async let req: Void = { _ = try await client.request(otherPath, body: [:]) }()
+    for _ in 0..<50 { try? await Task.sleep(for: .milliseconds(1)) }
+    #expect(await t.requests.filter { $0.alias == otherPath }.isEmpty)
+    await t.release(routePath)
+    try await login
+    try await req
+
+    let sent = await t.requests.filter { $0.alias == otherPath }
+    #expect(sent.count == 1)
+    #expect(sent.first?.headers["accesstoken"] == "tok")
+}
