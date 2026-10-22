@@ -17,7 +17,8 @@ Para contextualizar buscas:
 - Frameworks Apple: CoreLocation, Security (Keychain), Foundation (URLSession), CryptoKit / CommonCrypto
 - Distribuição: assinatura gratuita do Xcode (perfil de 7 dias), sem App Store
 - Integração externa: nuvem da Midea usada pelo app SmartHome (MSmartHome); ar Midea 42EFVCB12M5
-  (Springer Carrier, Brasil). Implementações de referência em Python:
+  (Springer Carrier, Brasil). Implementações de referência em Python (a principal é a midea_auto_cloud — ADR 0003):
+  - midea_auto_cloud — github.com/sususweet/midea_auto_cloud (controle pela nuvem MSmartHome, Apache-2.0)
   - msmart-ng — github.com/mill1000/midea-msmart
   - midea_ac_lan — github.com/wuwentao/midea_ac_lan (fork mantido do de georgezhao2010)
   - midea-beautiful-air — github.com/nbogojevic/midea-beautiful-air

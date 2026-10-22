@@ -84,6 +84,7 @@ Instalação no iPhone: skill `/instalar-iphone`.
   fora da UI e testável sem rede: rede, relógio e localização entram por protocolo injetável.
 - Teste automatizado **nunca** chama a nuvem real da Midea (o ar liga de verdade e a conta pode ser bloqueada).
 - Constantes do protocolo Midea (URLs, chaves, assinatura) só copiadas de fonte citada (URL + commit), nunca de memória.
+  Fonte do projeto: midea_auto_cloud (ADR 0003). Plano de implementação: `docs/plans/2026-10-21-app-ar.md`.
 
 ## Equipamento e rede (fatos levantados em 2026-10-21)
 
@@ -121,3 +122,4 @@ instala o grafo e o resumo `.scripts/graph-summary.mjs` e acrescenta aqui as reg
 - 2026-10-21 — Controle remoto pela nuvem da Midea; porta no roteador inviável por CGNAT (ver docs/decisions/0001)
 - 2026-10-21 — Instalação pelo Xcode com assinatura gratuita, sem loja (ver docs/decisions/0002)
 - 2026-10-21 — Ao entrar no raio de casa o ar liga direto, sem pedir confirmação (decisão do dono; vai para a spec)
+- 2026-10-21 — Protocolo portado da midea_auto_cloud, comandos JSON pela nuvem (ver docs/decisions/0003)

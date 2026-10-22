@@ -25,7 +25,10 @@ enviada pela nuvem
 ## Regras que não podem ser quebradas
 
 - Constantes (URLs, chaves do app, algoritmo de assinatura, chaves de criptografia) só copiadas de uma
-  implementação de referência com **URL + commit** citados no código. Nunca de memória — um byte errado
+  implementação de referência com **URL + commit** citados no código. Referência oficial do projeto
+  (ADR 0003): `sususweet/midea_auto_cloud@ce0c4b88224def0f6b53714312c19f71aa9c2a50`, `core/cloud.py` e
+  `core/security.py`; controle e estado por JSON (`/v1/device/lua/control`, `/v1/device/status/lua/get`).
+  msmart-ng e midea_ac_lan **não** controlam pela nuvem. Nunca de memória — um byte errado
   vira erro opaco da nuvem
 - Credencial e token só no Keychain. Nunca em log, `print`, UserDefaults, fixture ou commit
 - Nenhum teste automatizado chama a nuvem real: o ar liga de verdade e a conta pode ser bloqueada.
