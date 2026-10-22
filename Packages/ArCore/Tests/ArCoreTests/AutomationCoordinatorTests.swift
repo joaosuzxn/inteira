@@ -143,4 +143,22 @@ fileprivate final class FakeNotifier: AutomationNotifying, @unchecked Sendable {
         await d.handle(.enteredArrival, at: t0.addingTimeInterval(7200))
         #expect(control.sent.isEmpty)
     }
+
+    @Test func lastArrivalExitFollowsEvents() async {
+        let (c, _, _) = make(FakeControl(isOn: false))
+        #expect(await c.lastArrivalExit() == nil)
+        await c.handle(.exitedArrival, at: t0)
+        #expect(await c.lastArrivalExit() == t0)
+        await c.handle(.enteredArrival, at: t0.addingTimeInterval(3600))
+        #expect(await c.lastArrivalExit() == nil)
+        await c.handle(.exitedArrival, at: t0)
+        await c.resetForNewHome()
+        #expect(await c.lastArrivalExit() == nil)
+    }
+
+    @Test func radiusTextFormatsMetersAndKilometers() {
+        #expect(AutomationCoordinator.radiusText(450) == "450 m")
+        #expect(AutomationCoordinator.radiusText(2000) == "2 km")
+        #expect(AutomationCoordinator.radiusText(2540) == "2,5 km")
+    }
 }

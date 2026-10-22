@@ -51,6 +51,9 @@ public actor AutomationCoordinator {
         saveState()
     }
 
+    /// Hora da última saída do raio de chegada ainda sem volta (para a tela mostrar "fora há").
+    public func lastArrivalExit() -> Date? { state.lastArrivalExit }
+
     // MARK: - Envio
 
     private func run(_ command: ACCommand, event: HistoryEvent, at date: Date) async {
@@ -91,7 +94,7 @@ public actor AutomationCoordinator {
     }
 
     /// "500 m" abaixo de 1 km; senão km com até uma casa e vírgula ("2 km", "2,5 km").
-    static func radiusText(_ meters: Double) -> String {
+    public static func radiusText(_ meters: Double) -> String {
         if meters < 1000 { return "\(Int(meters.rounded())) m" }
         let tenths = Int((meters / 100).rounded())
         let whole = tenths / 10, decimal = tenths % 10
