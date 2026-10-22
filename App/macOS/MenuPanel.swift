@@ -56,6 +56,7 @@ struct MenuPanel: View {
         .padding(14)
         .frame(width: 260)
         .background(Theme.background)
+        .preferredColorScheme(.dark)
         .onAppear { Task { await model.refresh() } }
     }
 
@@ -158,5 +159,6 @@ struct AccountWindow: View {
             }
         }
         .frame(width: 340, height: 420)
+        .preferredColorScheme(.dark)
     }
 }
