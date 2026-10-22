@@ -37,3 +37,7 @@ Sai spec em docs/specs e plano em docs/plans antes de qualquer código.
 2026-10-21: Dono confirmou o gatilho: raio de 2 km em volta de casa; só dispara se ficou fora do raio por pelo menos 30 min.
 2026-10-21: Controle manual: ligar, desligar e mudar a temperatura. No Mac, só ícone na barra de menus (sem janela nem ícone no Dock). Visual das telas ainda será refinado.
 2026-10-21: Dono decidiu: ao sair do raio e ficar 30 min fora, o app desliga o ar. Raio, tempo fora e temperatura são configuráveis no app, não fixos no código.
+2026-10-21: Um raio só para chegar e sair. Desligar por causa de saída curta (academia) o dono faz na mão.
+2026-10-21: Correção do dono: dois raios configuráveis separadamente, um para chegar (liga) e outro para sair (desliga). Padrão dos dois: 2 km. Saída curta o dono desliga na mão.
+2026-10-21: Dono aprovou a identidade visual (spec §6.4) para o piloto, incluindo distância/tempo fora e grade de uso.
+2026-10-21: Dono decidiu: ao passar do raio de saída (padrão 2 km) o ar desliga na hora, sem esperar 30 min. Remove o risco do timer em segundo plano.
