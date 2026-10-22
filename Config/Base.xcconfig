@@ -1,0 +1,3 @@
+// Configuração comum aos dois alvos.
+// Local.xcconfig (ignorado pelo git) é opcional e só define DEVELOPMENT_TEAM para build no iPhone.
+#include? "Local.xcconfig"

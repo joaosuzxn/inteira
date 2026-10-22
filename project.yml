@@ -1,0 +1,49 @@
+name: Ar
+options:
+  bundleIdPrefix: io.github.joaosuzxn
+  deploymentTarget:
+    iOS: "18.0"
+    macOS: "15.0"
+configFiles:
+  Debug: Config/Base.xcconfig
+  Release: Config/Base.xcconfig
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+packages:
+  ArCore:
+    path: Packages/ArCore
+targets:
+  Ar-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - App/iOS
+      - App/Shared
+    dependencies:
+      - package: ArCore
+        product: ArCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.joaosuzxn.ar
+        PRODUCT_NAME: Ar
+        INFOPLIST_FILE: App/iOS/Info.plist
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+  Ar-macOS:
+    type: application
+    platform: macOS
+    sources:
+      - App/macOS
+      - App/Shared
+    dependencies:
+      - package: ArCore
+        product: ArCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.joaosuzxn.ar.mac
+        PRODUCT_NAME: Ar
+        INFOPLIST_FILE: App/macOS/Info.plist
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: NO
