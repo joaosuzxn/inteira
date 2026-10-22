@@ -10,8 +10,11 @@ projeto Xcode (targets, permissões no Info.plist, capacidades) e da instalaçã
 
 ## Arquivos Críticos
 
-Ainda não há código. Ao criar o projeto Xcode (backlog #1), listar aqui o projeto, as telas, o
-Info.plist com os textos de permissão de localização e o ponto de entrada do app.
+- `project.yml` — fonte do projeto Xcode (XcodeGen); `Ar.xcodeproj` é gerado e ignorado pelo git
+- `Config/Base.xcconfig`, `Config/Local.xcconfig.example` — `Local.xcconfig` (ignorado) só traz o `DEVELOPMENT_TEAM`
+- `App/Shared/Theme.swift` — cores e fonte monoespaçada (spec §6.4)
+- `App/iOS/ArApp.swift` e `App/iOS/Info.plist` — ponto de entrada do iPhone e textos de permissão de localização
+- `App/macOS/ArMenuBarApp.swift` e `App/macOS/Info.plist` — app de barra de menus (`LSUIElement`)
 
 ## Conceitos Principais
 
@@ -34,4 +37,8 @@ Info.plist com os textos de permissão de localização e o ponto de entrada do 
 
 ## Comandos Úteis
 
-A definir com o projeto Xcode (build do macOS, testes, instalação no iPhone).
+    xcodegen generate
+    xcodebuild -project Ar.xcodeproj -scheme Ar-iOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+    xcodebuild -project Ar.xcodeproj -scheme Ar-macOS -destination 'platform=macOS' build
+
+Instalação no iPhone: skill `/instalar-iphone`.

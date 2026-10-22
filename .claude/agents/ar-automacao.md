@@ -10,8 +10,11 @@ Faz o iPhone perceber que o dono está chegando em casa e mandar ligar o ar sem 
 
 ## Arquivos Críticos
 
-Ainda não há código. A estrutura sai do plano do backlog #1; ao criá-la, listar aqui o monitor de
-região, a regra de disparo (lógica pura) e os testes.
+Em `Packages/ArCore/Sources/ArCore/Automation/`:
+- `AutomationEngine.swift` — regra de disparo (lógica pura, relógio injetável)
+- `AutomationCoordinator.swift` e `AutomationSettings.swift`
+- `Storage/HistoryStore.swift` — registro dos disparos
+- Testes em `Packages/ArCore/Tests/ArCoreTests`
 
 ## Conceitos Principais
 
@@ -41,4 +44,4 @@ a confirmar na spec), para não ligar o ar depois de ir à padaria
 
 ## Comandos Úteis
 
-A definir com o projeto Xcode (testes da regra de disparo).
+    swift test --package-path Packages/ArCore

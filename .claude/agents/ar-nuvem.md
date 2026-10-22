@@ -11,8 +11,11 @@ decifrado pela comunidade (ADR 0001): pode mudar sem aviso.
 
 ## Arquivos Críticos
 
-Ainda não há código. A estrutura sai do plano do backlog #1; ao criá-la, listar aqui os arquivos de
-cliente da nuvem, montagem de comando, criptografia e os testes com fixtures.
+Em `Packages/ArCore/Sources/ArCore/`:
+- `Cloud/MideaCloudClient.swift`, `MideaCloudError.swift`, `MideaConstants.swift`, `MideaCrypto.swift`, `HTTPTransport.swift`
+- `Model/` — `ACCommand`, `ACStatus`, `Appliance`
+- `Service/AirConditionerService.swift` e `Storage/CredentialStore.swift` (Keychain)
+- Testes em `Packages/ArCore/Tests/ArCoreTests`
 
 ## Conceitos Principais
 
@@ -48,4 +51,4 @@ enviada pela nuvem
 
 ## Comandos Úteis
 
-A definir com o projeto Xcode (testes do módulo da nuvem).
+    swift test --package-path Packages/ArCore
